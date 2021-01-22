@@ -1,0 +1,50 @@
+[package]
+edition = "2018"
+name = "tree-sitter-facade"
+version = "0.0.0"
+authors = ["<hvithrafn@users.noreply.github.com>"]
+license = "Apache-2.0 WITH LLVM-exception"
+readme = "README.md"
+repository = "https://github.com/darinmorrison/tree-sitter-facade"
+description = """
+"""
+
+[badges]
+maintenance = { status = "experimental" }
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+doctest = false
+test = false
+
+[profile.release]
+codegen-units = 1
+lto = "fat"
+opt-level = 'z'
+panic = 'abort'
+
+[features]
+default = ["wee_alloc"]
+
+[dependencies]
+anyhow = "1.0"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tree-sitter = "0.17"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+js-sys = "0.3"
+wasm-bindgen = { version = "=0.2.69", features = ["strict-macro"] }
+web-tree-sitter = { package = "web-tree-sitter-sys", git = "https://github.com/hvithrafn/web-tree-sitter-sys", branch = "main" }
+wee_alloc = { version = "0.4", optional = true }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.web-sys]
+version = "0.3"
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+wasm-bindgen-futures = "0.4"
+wasm-bindgen-test = "0.3"
+
+[workspace]
+members = [".", "xtask"]
+default-members = ["."]
