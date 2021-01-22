@@ -1,0 +1,329 @@
+// FIXME: make .logger() return type uniform
+
+#[cfg(not(target_arch = "wasm32"))]
+mod native {
+    use crate::{
+        error::{IncludedRangesError, LanguageError},
+        language::Language,
+        logger::{Logger, LoggerReturn},
+        point::Point,
+        range::Range,
+        tree::Tree,
+    };
+    use core::sync::atomic::AtomicUsize;
+    use std::{convert::TryFrom, os::unix::io::AsRawFd};
+
+    pub struct Parser {
+        inner: tree_sitter::Parser,
+    }
+
+    impl Parser {
+        #[inline]
+        pub fn new() -> Self {
+            let inner = tree_sitter::Parser::new();
+            Self { inner }
+        }
+
+        #[allow(clippy::missing_safety_doc)]
+        #[inline]
+        pub unsafe fn cancellation_flag(&self) -> Option<&AtomicUsize> {
+            self.inner.cancellation_flag()
+        }
+
+        #[inline]
+        pub fn language(&self) -> Option<Language> {
+            self.inner.language().map(Into::into)
+        }
+
+        #[inline]
+        pub fn logger(&self) -> Option<LoggerReturn> {
+            if let Some(fun) = self.inner.logger() {
+                Some(LoggerReturn::new(fun))
+            } else {
+                None
+            }
+        }
+
+        #[inline]
+        pub fn parse(&mut self, text: impl AsRef<[u8]>, old_tree: Option<&Tree>) -> Option<Tree> {
+            let old_tree = old_tree.map(|tree| &tree.inner);
+            self.inner.parse(text, old_tree).map(Into::into)
+        }
+
+        #[inline]
+        pub fn parse_utf16(&mut self, text: impl AsRef<[u16]>, old_tree: Option<&Tree>) -> Option<Tree> {
+            let old_tree = old_tree.map(|tree| &tree.inner);
+            self.inner.parse_utf16(text, old_tree).map(Into::into)
+        }
+
+        #[inline]
+        pub fn parse_utf16_with<T, F>(&mut self, callback: &mut F, old_tree: Option<&Tree>) -> Option<Tree>
+        where
+            T: AsRef<[u16]>,
+            F: FnMut(u32, Point) -> T,
+        {
+            let mut callback = |offset, inner| callback(u32::try_from(offset).unwrap(), Point { inner });
+            let old_tree = old_tree.map(|tree| &tree.inner);
+            self.inner.parse_utf16_with(&mut callback, old_tree).map(Into::into)
+        }
+
+        #[inline]
+        pub fn parse_with<T, F>(&mut self, callback: &'static mut F, old_tree: Option<&Tree>) -> Option<Tree>
+        where
+            T: AsRef<[u8]>,
+            F: FnMut(u32, Point) -> T,
+        {
+            let mut callback = |offset, inner| callback(u32::try_from(offset).unwrap(), Point { inner });
+            let old_tree = old_tree.map(|tree| &tree.inner);
+            self.inner.parse_with(&mut callback, old_tree).map(Into::into)
+        }
+
+        #[inline]
+        pub fn print_dot_graphs(&mut self, file: &impl AsRawFd) {
+            self.inner.print_dot_graphs(file)
+        }
+
+        #[inline]
+        pub fn reset(&mut self) {
+            self.inner.reset()
+        }
+
+        #[allow(clippy::missing_safety_doc)]
+        #[inline]
+        pub unsafe fn set_cancellation_flag(&mut self, flag: Option<&AtomicUsize>) {
+            self.inner.set_cancellation_flag(flag);
+        }
+
+        #[inline]
+        pub fn set_included_ranges(&mut self, ranges: &[Range]) -> Result<(), IncludedRangesError> {
+            let ranges = ranges.iter().map(|range| range.inner).collect::<Vec<_>>();
+            self.inner.set_included_ranges(&ranges).map_err(Into::into)
+        }
+
+        #[inline]
+        pub fn set_language(&mut self, language: &Language) -> Result<(), LanguageError> {
+            let language = language.inner;
+            self.inner.set_language(language).map_err(Into::into)
+        }
+
+        #[inline]
+        pub fn set_logger(&mut self, logger: Option<Logger<'static>>) {
+            self.inner.set_logger(logger)
+        }
+
+        #[inline]
+        pub fn set_timeout_micros(&mut self, timeout_micros: f64) {
+            self.inner.set_timeout_micros(timeout_micros as u64)
+        }
+
+        #[inline]
+        pub fn stop_printing_dot_graphs(&mut self) {
+            self.inner.stop_printing_dot_graphs()
+        }
+
+        #[inline]
+        pub fn timeout_micros(&self) -> f64 {
+            self.inner.timeout_micros() as f64
+        }
+    }
+
+    impl Default for Parser {
+        #[inline]
+        fn default() -> Self {
+            Parser::new()
+        }
+    }
+
+    impl From<tree_sitter::Parser> for Parser {
+        #[inline]
+        fn from(inner: tree_sitter::Parser) -> Self {
+            Self { inner }
+        }
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub use native::*;
+
+#[cfg(target_arch = "wasm32")]
+mod wasm {
+    use crate::{
+        error::{IncludedRangesError, LanguageError},
+        language::Language,
+        logger::{LogType, Logger, LoggerReturn},
+        point::Point,
+        range::Range,
+        tree::Tree,
+    };
+    use js_sys::{Function, JsString};
+    use wasm_bindgen::{prelude::*, JsCast};
+
+    pub struct Parser {
+        inner: web_tree_sitter::Parser,
+        options: web_tree_sitter::ParseOptions,
+    }
+
+    impl Parser {
+        #[inline]
+        pub fn new() -> Self {
+            let inner = web_tree_sitter::Parser::new();
+            let options = Default::default();
+            Self { inner, options }
+        }
+
+        // #[inline]
+        // pub unsafe fn cancellation_flag(&self) -> Option<&AtomicUsize> {
+        //     unimplemented!()
+        // }
+
+        #[inline]
+        pub fn language(&self) -> Option<Language> {
+            self.inner.get_language().map(Into::into)
+        }
+
+        #[inline]
+        pub fn logger(&self) -> Option<LoggerReturn> {
+            if let Some(logger) = self.inner.get_logger() {
+                let options = js_sys::Object::new().into();
+                let fun = Box::new(move |type_: LogType, message: JsString| {
+                    let context = &wasm_bindgen::JsValue::NULL;
+                    let arg0 = &type_.into();
+                    let arg1 = &options;
+                    let arg2 = &message.into();
+                    logger.call3(context, arg0, arg1, arg2).unwrap();
+                }) as Box<dyn FnMut(LogType, JsString)>;
+                Some(LoggerReturn::new(fun))
+            } else {
+                None
+            }
+        }
+
+        #[inline]
+        pub fn parse(&mut self, text: impl AsRef<[u8]>, old_tree: Option<&Tree>) -> Option<Tree> {
+            let text = text.as_ref();
+            let text = unsafe { std::str::from_utf8_unchecked(text) };
+            let text = &text.into();
+            let old_tree = old_tree.map(|tree| &tree.inner);
+            let options = Some(&self.options);
+            self.inner.parse_with_string(text, old_tree, options).map(Into::into)
+        }
+
+        // #[inline]
+        // pub fn parse_utf16(&mut self, text: impl AsRef<[u16]>, old_tree: Option<&Tree>) -> Option<Tree> {
+        //     unimplemented!()
+        // }
+
+        // #[inline]
+        // pub fn parse_utf16_with<'a, T, F>(&mut self, callback: &mut F, old_tree: Option<&Tree>) ->
+        // Option<Tree> where
+        //     T: AsRef<[u16]>,
+        //     F: FnMut(u32, Point) -> T,
+        // {
+        //     unimplemented!()
+        // }
+
+        #[inline]
+        pub fn parse_with<'a, T, F>(&mut self, callback: &'static mut F, old_tree: Option<&Tree>) -> Option<Tree>
+        where
+            T: AsRef<[u8]>,
+            F: FnMut(u32, Option<Point>, Option<u32>) -> T,
+        {
+            let closure = Closure::wrap(Box::new(move |start_index, start_point: Option<_>, end_index| {
+                let start_point = start_point.map(Into::into);
+                let result = callback(start_index, start_point, end_index);
+                let result = result.as_ref();
+                let result = unsafe { std::str::from_utf8_unchecked(result) };
+                Some(result.into())
+            })
+                as Box<dyn FnMut(u32, Option<web_tree_sitter::Point>, Option<u32>) -> Option<JsString>>);
+            let input = closure.as_ref().unchecked_ref();
+            let old_tree = old_tree.map(|tree| &tree.inner);
+            let options = Some(&self.options);
+            let result = self.inner.parse_with_function(input, old_tree, options).map(Into::into);
+            closure.forget();
+            result
+        }
+
+        // #[inline]
+        // pub fn print_dot_graphs(&mut self, file: &impl AsRawFd) {
+        //     unimplemented!()
+        // }
+
+        #[inline]
+        pub fn reset(&mut self) {
+            self.inner.reset()
+        }
+
+        // #[inline]
+        // pub unsafe fn set_cancellation_flag(&mut self, flag: Option<&AtomicUsize>) {
+        //     unimplemented!()
+        // }
+
+        #[inline]
+        pub fn set_included_ranges<'a>(&mut self, ranges: &'a [Range]) -> Result<(), IncludedRangesError> {
+            // FIXME: check `ranges[i].end_byte <= ranges[i + 1].start_byte` or throw
+            let ranges = ranges.iter().map(|range| &range.inner).collect::<js_sys::Array>();
+            let options = web_tree_sitter::ParseOptions::new(Some(&ranges));
+            self.options = options;
+            Ok(())
+        }
+
+        #[inline]
+        pub fn set_language(&mut self, language: &Language) -> Result<(), LanguageError> {
+            let language = Some(&language.inner);
+            self.inner.set_language(language).map_err(Into::into)
+        }
+
+        #[inline]
+        pub fn set_logger(&mut self, logger: Option<Logger<'static>>) {
+            if let Some(logger) = logger {
+                let clo = Closure::wrap(logger);
+                let fun = clo.as_ref().unchecked_ref::<Function>();
+                self.inner.set_logger(Some(&fun));
+                clo.forget();
+            } else {
+                self.inner.set_logger(None);
+            }
+        }
+
+        #[inline]
+        pub fn set_timeout_micros(&mut self, timeout_micros: f64) {
+            self.inner.set_timeout_micros(timeout_micros)
+        }
+
+        // #[inline]
+        // pub fn stop_printing_dot_graphs(&mut self) {
+        //     unimplemented!()
+        // }
+
+        #[inline]
+        pub fn timeout_micros(&self) -> f64 {
+            self.inner.get_timeout_micros()
+        }
+    }
+
+    impl Default for Parser {
+        #[inline]
+        fn default() -> Self {
+            Parser::new()
+        }
+    }
+
+    impl Drop for Parser {
+        #[inline]
+        fn drop(&mut self) {
+            self.inner.delete();
+        }
+    }
+
+    impl From<web_tree_sitter::Parser> for Parser {
+        #[inline]
+        fn from(inner: web_tree_sitter::Parser) -> Self {
+            let options = Default::default();
+            Self { inner, options }
+        }
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+pub use wasm::*;
