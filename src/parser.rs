@@ -3,7 +3,7 @@
 #[cfg(not(target_arch = "wasm32"))]
 mod native {
     use crate::{
-        error::{IncludedRangesError, LanguageError},
+        error::{IncludedRangesError, LanguageError, ParserError},
         language::Language,
         logger::{Logger, LoggerReturn},
         point::Point,
@@ -19,9 +19,9 @@ mod native {
 
     impl Parser {
         #[inline]
-        pub fn new() -> Self {
+        pub fn new() -> Result<Self, ParserError> {
             let inner = tree_sitter::Parser::new();
-            Self { inner }
+            Ok(Self { inner })
         }
 
         #[allow(clippy::missing_safety_doc)]
@@ -45,37 +45,47 @@ mod native {
         }
 
         #[inline]
-        pub fn parse(&mut self, text: impl AsRef<[u8]>, old_tree: Option<&Tree>) -> Option<Tree> {
+        pub fn parse(&mut self, text: impl AsRef<[u8]>, old_tree: Option<&Tree>) -> Result<Option<Tree>, ParserError> {
             let old_tree = old_tree.map(|tree| &tree.inner);
-            self.inner.parse(text, old_tree).map(Into::into)
+            Ok(self.inner.parse(text, old_tree).map(Into::into))
         }
 
         #[inline]
-        pub fn parse_utf16(&mut self, text: impl AsRef<[u16]>, old_tree: Option<&Tree>) -> Option<Tree> {
+        pub fn parse_utf16(
+            &mut self,
+            text: impl AsRef<[u16]>,
+            old_tree: Option<&Tree>,
+        ) -> Result<Option<Tree>, ParserError> {
             let old_tree = old_tree.map(|tree| &tree.inner);
-            self.inner.parse_utf16(text, old_tree).map(Into::into)
+            Ok(self.inner.parse_utf16(text, old_tree).map(Into::into))
         }
 
         #[inline]
-        pub fn parse_utf16_with<T, F>(&mut self, callback: &mut F, old_tree: Option<&Tree>) -> Option<Tree>
+        pub fn parse_utf16_with<T>(
+            &mut self,
+            mut callback: impl FnMut(u32, Point) -> T,
+            old_tree: Option<&Tree>,
+        ) -> Result<Option<Tree>, ParserError>
         where
             T: AsRef<[u16]>,
-            F: FnMut(u32, Point) -> T,
         {
             let mut callback = |offset, inner| callback(u32::try_from(offset).unwrap(), Point { inner });
             let old_tree = old_tree.map(|tree| &tree.inner);
-            self.inner.parse_utf16_with(&mut callback, old_tree).map(Into::into)
+            Ok(self.inner.parse_utf16_with(&mut callback, old_tree).map(Into::into))
         }
 
         #[inline]
-        pub fn parse_with<T, F>(&mut self, callback: &'static mut F, old_tree: Option<&Tree>) -> Option<Tree>
+        pub fn parse_with<T>(
+            &mut self,
+            mut callback: impl FnMut(u32, Point) -> T,
+            old_tree: Option<&Tree>,
+        ) -> Result<Option<Tree>, ParserError>
         where
             T: AsRef<[u8]>,
-            F: FnMut(u32, Point) -> T,
         {
             let mut callback = |offset, inner| callback(u32::try_from(offset).unwrap(), Point { inner });
             let old_tree = old_tree.map(|tree| &tree.inner);
-            self.inner.parse_with(&mut callback, old_tree).map(Into::into)
+            Ok(self.inner.parse_with(&mut callback, old_tree).map(Into::into))
         }
 
         #[inline]
@@ -127,13 +137,6 @@ mod native {
         }
     }
 
-    impl Default for Parser {
-        #[inline]
-        fn default() -> Self {
-            Parser::new()
-        }
-    }
-
     impl From<tree_sitter::Parser> for Parser {
         #[inline]
         fn from(inner: tree_sitter::Parser) -> Self {
@@ -148,7 +151,7 @@ pub use native::*;
 #[cfg(target_arch = "wasm32")]
 mod wasm {
     use crate::{
-        error::{IncludedRangesError, LanguageError},
+        error::{IncludedRangesError, LanguageError, ParserError},
         language::Language,
         logger::{LogType, Logger, LoggerReturn},
         point::Point,
@@ -165,10 +168,10 @@ mod wasm {
 
     impl Parser {
         #[inline]
-        pub fn new() -> Self {
-            let inner = web_tree_sitter::Parser::new();
+        pub fn new() -> Result<Self, ParserError> {
+            let inner = web_tree_sitter::Parser::new()?;
             let options = Default::default();
-            Self { inner, options }
+            Ok(Self { inner, options })
         }
 
         // #[inline]
@@ -199,13 +202,16 @@ mod wasm {
         }
 
         #[inline]
-        pub fn parse(&mut self, text: impl AsRef<[u8]>, old_tree: Option<&Tree>) -> Option<Tree> {
+        pub fn parse(&mut self, text: impl AsRef<[u8]>, old_tree: Option<&Tree>) -> Result<Option<Tree>, ParserError> {
             let text = text.as_ref();
             let text = unsafe { std::str::from_utf8_unchecked(text) };
             let text = &text.into();
             let old_tree = old_tree.map(|tree| &tree.inner);
             let options = Some(&self.options);
-            self.inner.parse_with_string(text, old_tree, options).map(Into::into)
+            self.inner
+                .parse_with_string(text, old_tree, options)
+                .map(|ok| ok.map(Into::into))
+                .map_err(Into::into)
         }
 
         // #[inline]
@@ -223,10 +229,13 @@ mod wasm {
         // }
 
         #[inline]
-        pub fn parse_with<'a, T, F>(&mut self, callback: &'static mut F, old_tree: Option<&Tree>) -> Option<Tree>
+        pub fn parse_with<T>(
+            &mut self,
+            mut callback: impl FnMut(u32, Option<Point>, Option<u32>) -> T + 'static,
+            old_tree: Option<&Tree>,
+        ) -> Result<Option<Tree>, ParserError>
         where
             T: AsRef<[u8]>,
-            F: FnMut(u32, Option<Point>, Option<u32>) -> T,
         {
             let closure = Closure::wrap(Box::new(move |start_index, start_point: Option<_>, end_index| {
                 let start_point = start_point.map(Into::into);
@@ -239,7 +248,11 @@ mod wasm {
             let input = closure.as_ref().unchecked_ref();
             let old_tree = old_tree.map(|tree| &tree.inner);
             let options = Some(&self.options);
-            let result = self.inner.parse_with_function(input, old_tree, options).map(Into::into);
+            let result = self
+                .inner
+                .parse_with_function(input, old_tree, options)
+                .map(|ok| ok.map(Into::into))
+                .map_err(Into::into);
             closure.forget();
             result
         }
@@ -299,13 +312,6 @@ mod wasm {
         #[inline]
         pub fn timeout_micros(&self) -> f64 {
             self.inner.get_timeout_micros()
-        }
-    }
-
-    impl Default for Parser {
-        #[inline]
-        fn default() -> Self {
-            Parser::new()
         }
     }
 
