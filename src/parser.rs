@@ -215,15 +215,22 @@ mod wasm {
         }
 
         // #[inline]
-        // pub fn parse_utf16(&mut self, text: impl AsRef<[u16]>, old_tree: Option<&Tree>) -> Option<Tree> {
+        // pub fn parse_utf16(
+        //     &mut self,
+        //     text: impl AsRef<[u16]>,
+        //     old_tree: Option<&Tree>,
+        // ) -> Result<Option<Tree>, ParserError> {
         //     unimplemented!()
         // }
 
         // #[inline]
-        // pub fn parse_utf16_with<'a, T, F>(&mut self, callback: &mut F, old_tree: Option<&Tree>) ->
-        // Option<Tree> where
+        // pub fn parse_utf16_with<T>(
+        //     &mut self,
+        //     callback: impl FnMut(u32, Point) -> T + 'static,
+        //     old_tree: Option<&Tree>,
+        // ) -> Result<Option<Tree>, ParserError>
+        // where
         //     T: AsRef<[u16]>,
-        //     F: FnMut(u32, Point) -> T,
         // {
         //     unimplemented!()
         // }
