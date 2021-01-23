@@ -1,6 +1,6 @@
 #[cfg(not(target_arch = "wasm32"))]
 mod native {
-    #[derive(Debug, PartialEq)]
+    #[derive(Debug, Eq, PartialEq)]
     pub struct IncludedRangesError {
         pub(crate) inner: tree_sitter::IncludedRangesError,
     }
@@ -13,7 +13,7 @@ mod native {
         }
     }
 
-    #[derive(Debug, PartialEq)]
+    #[derive(Debug, Eq, PartialEq)]
     pub struct QueryError {
         pub(crate) inner: tree_sitter::QueryError,
     }
@@ -26,7 +26,7 @@ mod native {
         }
     }
 
-    #[derive(Debug, PartialEq)]
+    #[derive(Debug, Eq, PartialEq)]
     pub struct LanguageError {
         pub(crate) inner: tree_sitter::LanguageError,
     }
@@ -45,7 +45,7 @@ pub use native::*;
 
 #[cfg(target_arch = "wasm32")]
 mod wasm {
-    #[derive(Debug, PartialEq)]
+    #[derive(Debug, Eq, PartialEq)]
     pub struct IncludedRangesError {
         pub(crate) inner: js_sys::Error,
     }
@@ -58,7 +58,7 @@ mod wasm {
         }
     }
 
-    #[derive(Debug, PartialEq)]
+    #[derive(Debug, Eq, PartialEq)]
     pub struct LanguageError {
         pub(crate) inner: web_tree_sitter::LanguageError,
     }
@@ -71,7 +71,7 @@ mod wasm {
         }
     }
 
-    #[derive(Debug, PartialEq)]
+    #[derive(Debug, Eq, PartialEq)]
     pub struct QueryError {
         pub(crate) inner: web_tree_sitter::QueryError,
     }
