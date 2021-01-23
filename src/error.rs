@@ -53,6 +53,18 @@ mod native {
             Self { inner }
         }
     }
+
+    #[derive(Debug, Eq, PartialEq)]
+    pub struct ParserError {
+        pub(crate) inner: std::convert::Infallible,
+    }
+    impl std::fmt::Display for ParserError {
+        fn fmt(&self, _fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            unreachable!()
+        }
+    }
+    impl std::error::Error for ParserError {
+    }
 }
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -90,6 +102,24 @@ mod wasm {
     impl std::error::Error for LanguageError {
     }
     impl From<web_tree_sitter::LanguageError> for LanguageError {
+        #[inline]
+        fn from(inner: web_tree_sitter::LanguageError) -> Self {
+            Self { inner }
+        }
+    }
+
+    #[derive(Debug, Eq, PartialEq)]
+    pub struct ParserError {
+        pub(crate) inner: web_tree_sitter::ParserError,
+    }
+    impl std::fmt::Display for ParserError {
+        fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            fmt.write_str(&<_ as Into<String>>::into(self.inner.message()))
+        }
+    }
+    impl std::error::Error for ParserError {
+    }
+    impl From<web_tree_sitter::ParserError> for ParserError {
         #[inline]
         fn from(inner: web_tree_sitter::ParserError) -> Self {
             Self { inner }
