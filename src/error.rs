@@ -7,8 +7,7 @@ mod native {
 
     impl From<tree_sitter::IncludedRangesError> for IncludedRangesError {
         #[inline]
-        fn from(error: tree_sitter::IncludedRangesError) -> Self {
-            let inner = error;
+        fn from(inner: tree_sitter::IncludedRangesError) -> Self {
             Self { inner }
         }
     }
@@ -20,8 +19,7 @@ mod native {
 
     impl From<tree_sitter::QueryError> for QueryError {
         #[inline]
-        fn from(error: tree_sitter::QueryError) -> Self {
-            let inner = error;
+        fn from(inner: tree_sitter::QueryError) -> Self {
             Self { inner }
         }
     }
@@ -33,8 +31,7 @@ mod native {
 
     impl From<tree_sitter::LanguageError> for LanguageError {
         #[inline]
-        fn from(error: tree_sitter::LanguageError) -> Self {
-            let inner = error;
+        fn from(inner: tree_sitter::LanguageError) -> Self {
             Self { inner }
         }
     }
@@ -52,8 +49,7 @@ mod wasm {
 
     impl From<js_sys::Error> for IncludedRangesError {
         #[inline]
-        fn from(error: js_sys::Error) -> Self {
-            let inner = error;
+        fn from(inner: js_sys::Error) -> Self {
             Self { inner }
         }
     }
@@ -65,8 +61,7 @@ mod wasm {
 
     impl From<web_tree_sitter::LanguageError> for LanguageError {
         #[inline]
-        fn from(error: web_tree_sitter::LanguageError) -> Self {
-            let inner = error;
+        fn from(inner: web_tree_sitter::ParserError) -> Self {
             Self { inner }
         }
     }
@@ -78,8 +73,7 @@ mod wasm {
 
     impl From<web_tree_sitter::QueryError> for QueryError {
         #[inline]
-        fn from(error: web_tree_sitter::QueryError) -> Self {
-            let inner = error;
+        fn from(inner: web_tree_sitter::QueryError) -> Self {
             Self { inner }
         }
     }
