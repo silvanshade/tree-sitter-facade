@@ -10,6 +10,21 @@ mod native {
 
     impl Range {
         #[inline]
+        pub fn new(start_byte: u32, end_byte: u32, start_point: &Point, end_point: &Point) -> Self {
+            let start_byte = start_byte as usize;
+            let end_byte = end_byte as usize;
+            let start_point = start_point.inner;
+            let end_point = end_point.inner;
+            tree_sitter::Range {
+                start_byte,
+                end_byte,
+                start_point,
+                end_point,
+            }
+            .into()
+        }
+
+        #[inline]
         pub fn end_byte(&self) -> u32 {
             u32::try_from(self.inner.end_byte).unwrap()
         }
@@ -29,6 +44,16 @@ mod native {
         pub fn start_point(&self) -> Point {
             let inner = self.inner.start_point;
             Point { inner }
+        }
+    }
+
+    impl Default for Range {
+        fn default() -> Self {
+            let start_byte = Default::default();
+            let end_byte = Default::default();
+            let start_position = &Default::default();
+            let end_position = &Default::default();
+            Self::new(start_byte, end_byte, start_position, end_position)
         }
     }
 
@@ -54,6 +79,13 @@ mod wasm {
 
     impl Range {
         #[inline]
+        pub fn new(start_byte: u32, end_byte: u32, start_point: &Point, end_point: &Point) -> Self {
+            let start_point = &start_point.inner;
+            let end_point = &end_point.inner;
+            web_tree_sitter::Range::new(start_point, end_point, start_byte, end_byte).into()
+        }
+
+        #[inline]
         pub fn end_byte(&self) -> u32 {
             self.inner.end_index()
         }
@@ -73,6 +105,16 @@ mod wasm {
         pub fn start_point(&self) -> Point {
             let inner = self.inner.start_position();
             Point { inner }
+        }
+    }
+
+    impl Default for Range {
+        fn default() -> Self {
+            let start_byte = Default::default();
+            let end_byte = Default::default();
+            let start_position = &Default::default();
+            let end_position = &Default::default();
+            Self::new(start_byte, end_byte, start_position, end_position)
         }
     }
 
