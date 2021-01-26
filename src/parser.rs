@@ -77,7 +77,7 @@ mod native {
         #[inline]
         pub fn parse_with<T>(
             &mut self,
-            mut callback: impl FnMut(u32, Point) -> T,
+            mut callback: impl FnMut(u32, Point) -> T + 'static,
             old_tree: Option<&Tree>,
         ) -> Result<Option<Tree>, ParserError>
         where
