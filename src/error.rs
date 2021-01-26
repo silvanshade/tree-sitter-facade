@@ -4,6 +4,10 @@ mod native {
     pub struct IncludedRangesError {
         pub(crate) inner: tree_sitter::IncludedRangesError,
     }
+    unsafe impl Send for IncludedRangesError {
+    }
+    unsafe impl Sync for IncludedRangesError {
+    }
     impl std::fmt::Display for IncludedRangesError {
         fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             write!(fmt, "{:?}", self.inner)
@@ -21,6 +25,10 @@ mod native {
     #[derive(Debug, Eq, PartialEq)]
     pub struct QueryError {
         pub(crate) inner: tree_sitter::QueryError,
+    }
+    unsafe impl Send for QueryError {
+    }
+    unsafe impl Sync for QueryError {
     }
     impl std::fmt::Display for QueryError {
         fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -40,6 +48,10 @@ mod native {
     pub struct LanguageError {
         pub(crate) inner: tree_sitter::LanguageError,
     }
+    unsafe impl Send for LanguageError {
+    }
+    unsafe impl Sync for LanguageError {
+    }
     impl std::fmt::Display for LanguageError {
         fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             self.inner.fmt(fmt)
@@ -57,6 +69,10 @@ mod native {
     #[derive(Debug, Eq, PartialEq)]
     pub struct ParserError {
         pub(crate) inner: std::convert::Infallible,
+    }
+    unsafe impl Send for ParserError {
+    }
+    unsafe impl Sync for ParserError {
     }
     impl std::fmt::Display for ParserError {
         fn fmt(&self, _fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -76,6 +92,10 @@ mod wasm {
     pub struct IncludedRangesError {
         pub(crate) inner: js_sys::Error,
     }
+    unsafe impl Send for IncludedRangesError {
+    }
+    unsafe impl Sync for IncludedRangesError {
+    }
     impl std::fmt::Display for IncludedRangesError {
         fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             fmt.write_str(&<_ as Into<String>>::into(self.inner.message()))
@@ -93,6 +113,10 @@ mod wasm {
     #[derive(Debug, Eq, PartialEq)]
     pub struct LanguageError {
         pub(crate) inner: web_tree_sitter::LanguageError,
+    }
+    unsafe impl Send for LanguageError {
+    }
+    unsafe impl Sync for LanguageError {
     }
     impl std::fmt::Display for LanguageError {
         fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -112,6 +136,10 @@ mod wasm {
     pub struct ParserError {
         pub(crate) inner: web_tree_sitter::ParserError,
     }
+    unsafe impl Send for ParserError {
+    }
+    unsafe impl Sync for ParserError {
+    }
     impl std::fmt::Display for ParserError {
         fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             fmt.write_str(&<_ as Into<String>>::into(self.inner.message()))
@@ -129,6 +157,10 @@ mod wasm {
     #[derive(Debug, Eq, PartialEq)]
     pub struct QueryError {
         pub(crate) inner: web_tree_sitter::QueryError,
+    }
+    unsafe impl Send for QueryError {
+    }
+    unsafe impl Sync for QueryError {
     }
     impl std::fmt::Display for QueryError {
         fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
