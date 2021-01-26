@@ -191,6 +191,12 @@ mod wasm {
             Self { inner }
         }
     }
+
+    unsafe impl Send for InputEdit {
+    }
+
+    unsafe impl Sync for InputEdit {
+    }
 }
 
 #[cfg(target_arch = "wasm32")]

@@ -106,6 +106,9 @@ mod wasm {
             Self { inner }
         }
     }
+
+    unsafe impl Send for Tree {
+    }
 }
 
 #[cfg(target_arch = "wasm32")]

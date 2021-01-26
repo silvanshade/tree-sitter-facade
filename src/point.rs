@@ -83,6 +83,12 @@ mod wasm {
             Self { inner }
         }
     }
+
+    unsafe impl Send for Point {
+    }
+
+    unsafe impl Sync for Point {
+    }
 }
 
 #[cfg(target_arch = "wasm32")]

@@ -124,6 +124,12 @@ mod wasm {
             Self { inner }
         }
     }
+
+    unsafe impl Send for Range {
+    }
+
+    unsafe impl Sync for Range {
+    }
 }
 
 #[cfg(target_arch = "wasm32")]
