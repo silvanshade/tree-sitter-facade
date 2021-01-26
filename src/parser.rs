@@ -166,6 +166,9 @@ mod wasm {
         options: web_tree_sitter::ParseOptions,
     }
 
+    unsafe impl Send for Parser {
+    }
+
     impl Parser {
         #[inline]
         pub fn new() -> Result<Self, ParserError> {

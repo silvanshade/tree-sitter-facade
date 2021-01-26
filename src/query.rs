@@ -54,6 +54,12 @@ mod wasm {
             Self { inner }
         }
     }
+
+    unsafe impl Send for Query {
+    }
+
+    unsafe impl Sync for Query {
+    }
 }
 
 #[cfg(target_arch = "wasm32")]

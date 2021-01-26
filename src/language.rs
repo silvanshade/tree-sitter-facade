@@ -130,6 +130,12 @@ mod wasm {
             Self { inner }
         }
     }
+
+    unsafe impl Send for Language {
+    }
+
+    unsafe impl Sync for Language {
+    }
 }
 
 #[cfg(target_arch = "wasm32")]
