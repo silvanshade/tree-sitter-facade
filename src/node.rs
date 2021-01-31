@@ -391,11 +391,10 @@ mod wasm {
             From::<String>::from(self.inner.type_().into())
         }
 
-        // FIXME: does this map to anything?
-        // #[inline]
-        // pub fn kind_id(&self) -> u16 {
-        //     unimplemented!()
-        // }
+        #[inline]
+        pub fn kind_id(&self) -> u16 {
+            self.inner.type_id()
+        }
 
         // #[inline]
         // pub fn language(&self) -> Language {
