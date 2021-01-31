@@ -117,7 +117,11 @@ jobs:
   cargo-test-native:
     name: Run cargo test (native)
     needs: [skip-commit]
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+        runtime: [smol, tokio]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - name: Install Rust toolchain
