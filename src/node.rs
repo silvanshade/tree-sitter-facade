@@ -386,7 +386,6 @@ mod wasm {
             self.inner.is_named()
         }
 
-        // FIXME: check that this is correct
         #[inline]
         pub fn kind(&self) -> Cow<str> {
             From::<String>::from(self.inner.type_().into())
