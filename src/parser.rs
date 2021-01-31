@@ -11,7 +11,7 @@ mod native {
         tree::Tree,
     };
     use core::sync::atomic::AtomicUsize;
-    use std::{convert::TryFrom, os::unix::io::AsRawFd};
+    use std::convert::TryFrom;
 
     pub struct Parser {
         inner: tree_sitter::Parser,
@@ -88,8 +88,9 @@ mod native {
             Ok(self.inner.parse_with(&mut callback, old_tree).map(Into::into))
         }
 
+        #[cfg(unix)]
         #[inline]
-        pub fn print_dot_graphs(&mut self, file: &impl AsRawFd) {
+        pub fn print_dot_graphs(&mut self, file: &impl std::os::unix::io::AsRawFd) {
             self.inner.print_dot_graphs(file)
         }
 
@@ -266,11 +267,6 @@ mod wasm {
             closure.forget();
             result
         }
-
-        // #[inline]
-        // pub fn print_dot_graphs(&mut self, file: &impl AsRawFd) {
-        //     unimplemented!()
-        // }
 
         #[inline]
         pub fn reset(&mut self) {
