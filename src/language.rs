@@ -93,30 +93,30 @@ mod wasm {
             self.inner.field_name_for_id(field_id).map(Into::into)
         }
 
-        // #[inline]
-        // pub fn id_for_node_kind(&self, kind: &str, named: bool) -> u16 {
-        //     unimplemented!()
-        // }
+        #[inline]
+        pub fn id_for_node_kind(&self, kind: &str, named: bool) -> u16 {
+            self.inner.id_for_node_kind(kind, named)
+        }
 
-        // #[inline]
-        // pub fn node_kind_count(&self) -> u32 {
-        //     unimplemented!()
-        // }
+        #[inline]
+        pub fn node_kind_count(&self) -> u16 {
+            self.inner.node_kind_count()
+        }
 
-        // #[inline]
-        // pub fn node_kind_for_id(&self, id: u16) -> Option<Cow<str>> {
-        //     unimplemented!()
-        // }
+        #[inline]
+        pub fn node_kind_for_id(&self, id: u16) -> Option<Cow<str>> {
+            self.inner.node_kind_for_id(id).map(Into::into)
+        }
 
-        // #[inline]
-        // pub fn node_kind_is_named(&self, id: u16) -> bool {
-        //     unimplemented!()
-        // }
+        #[inline]
+        pub fn node_kind_is_named(&self, id: u16) -> bool {
+            self.inner.node_kind_is_named(id)
+        }
 
-        // #[inline]
-        // pub fn node_kind_is_visible(&self, id: u16) -> bool {
-        //     unimplemented!()
-        // }
+        #[inline]
+        pub fn node_kind_is_visible(&self, id: u16) -> bool {
+            self.inner.node_kind_is_visible(id)
+        }
 
         #[inline]
         pub fn version(&self) -> u32 {
