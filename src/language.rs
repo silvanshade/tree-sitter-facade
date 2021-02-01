@@ -9,8 +9,8 @@ mod native {
 
     impl Language {
         #[inline]
-        pub fn field_count(&self) -> u32 {
-            u32::try_from(self.inner.field_count()).unwrap()
+        pub fn field_count(&self) -> u16 {
+            u16::try_from(self.inner.field_count()).unwrap()
         }
 
         #[inline]
@@ -30,8 +30,8 @@ mod native {
         }
 
         #[inline]
-        pub fn node_kind_count(&self) -> u32 {
-            u32::try_from(self.inner.node_kind_count()).unwrap()
+        pub fn node_kind_count(&self) -> u16 {
+            u16::try_from(self.inner.node_kind_count()).unwrap()
         }
 
         #[inline]
