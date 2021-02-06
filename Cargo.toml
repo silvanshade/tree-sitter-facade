@@ -24,7 +24,6 @@ opt-level = 'z'
 panic = 'abort'
 
 [features]
-default = ["wee_alloc"]
 
 [dependencies]
 anyhow = "1.0"
@@ -35,7 +34,6 @@ tree-sitter = "0.17"
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 js-sys = "0.3"
 wasm-bindgen = { version = "=0.2.70", features = ["strict-macro"] }
-wee_alloc = { version = "0.4", optional = true }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies.web-tree-sitter]
 package = "web-tree-sitter-sys"
