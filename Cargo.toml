@@ -15,8 +15,7 @@ maintenance = { status = "experimental" }
 [profile.release]
 codegen-units = 1
 lto = "fat"
-opt-level = 'z'
-panic = 'abort'
+opt-level = "z"
 
 [features]
 
