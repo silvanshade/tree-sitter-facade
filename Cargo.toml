@@ -12,11 +12,6 @@ description = """
 [badges]
 maintenance = { status = "experimental" }
 
-[lib]
-crate-type = ["cdylib", "rlib"]
-doctest = false
-test = false
-
 [profile.release]
 codegen-units = 1
 lto = "fat"
