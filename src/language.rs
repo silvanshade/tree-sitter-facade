@@ -2,7 +2,7 @@
 mod native {
     use std::{borrow::Cow, convert::TryFrom};
 
-    #[derive(Clone, Debug, PartialEq)]
+    #[derive(Clone, PartialEq)]
     pub struct Language {
         pub(crate) inner: tree_sitter::Language,
     }
@@ -55,6 +55,12 @@ mod native {
         }
     }
 
+    impl std::fmt::Debug for Language {
+        fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+            std::fmt::Debug::fmt(&self.inner, fmt)
+        }
+    }
+
     impl From<tree_sitter::Language> for Language {
         #[inline]
         fn from(inner: tree_sitter::Language) -> Self {
@@ -70,7 +76,7 @@ pub use native::*;
 mod wasm {
     use std::borrow::Cow;
 
-    #[derive(Clone, Debug, PartialEq)]
+    #[derive(Clone, PartialEq)]
     pub struct Language {
         pub(crate) inner: web_tree_sitter::Language,
     }
@@ -121,6 +127,12 @@ mod wasm {
         #[inline]
         pub fn version(&self) -> u32 {
             self.inner.version()
+        }
+    }
+
+    impl std::fmt::Debug for Language {
+        fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+            std::fmt::Debug::fmt(&self.inner, fmt)
         }
     }
 

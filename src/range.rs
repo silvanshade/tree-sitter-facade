@@ -3,7 +3,7 @@ mod native {
     use crate::point::Point;
     use std::convert::TryFrom;
 
-    #[derive(Clone, Debug, PartialEq)]
+    #[derive(Clone, PartialEq)]
     pub struct Range {
         pub(crate) inner: tree_sitter::Range,
     }
@@ -47,6 +47,12 @@ mod native {
         }
     }
 
+    impl std::fmt::Debug for Range {
+        fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+            std::fmt::Debug::fmt(&self.inner, fmt)
+        }
+    }
+
     impl Default for Range {
         fn default() -> Self {
             let start_byte = Default::default();
@@ -72,7 +78,7 @@ pub use native::*;
 mod wasm {
     use crate::point::Point;
 
-    #[derive(Clone, Debug, PartialEq)]
+    #[derive(Clone, PartialEq)]
     pub struct Range {
         pub(crate) inner: web_tree_sitter::Range,
     }
@@ -105,6 +111,12 @@ mod wasm {
         pub fn start_point(&self) -> Point {
             let inner = self.inner.start_position();
             Point { inner }
+        }
+    }
+
+    impl std::fmt::Debug for Range {
+        fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+            std::fmt::Debug::fmt(&self.inner, fmt)
         }
     }
 

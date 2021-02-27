@@ -3,7 +3,7 @@ mod native {
     use crate::point::Point;
     use std::convert::TryFrom;
 
-    #[derive(Clone, Debug, Eq, PartialEq)]
+    #[derive(Clone, Eq, PartialEq)]
     pub struct InputEdit {
         pub(crate) inner: tree_sitter::InputEdit,
     }
@@ -69,6 +69,12 @@ mod native {
         }
     }
 
+    impl std::fmt::Debug for InputEdit {
+        fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+            std::fmt::Debug::fmt(&self.inner, fmt)
+        }
+    }
+
     impl Default for InputEdit {
         fn default() -> Self {
             let start_index = Default::default();
@@ -103,7 +109,7 @@ pub use native::*;
 mod wasm {
     use crate::point::Point;
 
-    #[derive(Clone, Debug, Eq, PartialEq)]
+    #[derive(Clone, Eq, PartialEq)]
     pub struct InputEdit {
         pub(crate) inner: web_tree_sitter::Edit,
     }
@@ -163,6 +169,12 @@ mod wasm {
         pub fn start_position(&self) -> Point {
             let inner = self.inner.start_position();
             Point { inner }
+        }
+    }
+
+    impl std::fmt::Debug for InputEdit {
+        fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+            std::fmt::Debug::fmt(&self.inner, fmt)
         }
     }
 
