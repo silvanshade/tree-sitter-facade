@@ -3,7 +3,7 @@ mod native {
     use crate::{input_edit::InputEdit, language::Language, point::Point, range::Range, tree_cursor::TreeCursor};
     use std::{borrow::Cow, convert::TryFrom};
 
-    #[derive(Clone, Debug, Eq, Hash, PartialEq)]
+    #[derive(Clone, Eq, Hash, PartialEq)]
     pub struct Node<'tree> {
         pub(crate) inner: tree_sitter::Node<'tree>,
     }
@@ -239,6 +239,12 @@ mod native {
         }
     }
 
+    impl<'tree> std::fmt::Debug for Node<'tree> {
+        fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+            std::fmt::Debug::fmt(&self.inner, fmt)
+        }
+    }
+
     impl<'tree> From<tree_sitter::Node<'tree>> for Node<'tree> {
         #[inline]
         fn from(inner: tree_sitter::Node<'tree>) -> Self {
@@ -257,7 +263,7 @@ mod wasm {
     use wasm_bindgen::{prelude::*, JsCast};
     use web_tree_sitter::SyntaxNode;
 
-    #[derive(Clone, Debug, Eq, Hash, PartialEq)]
+    #[derive(Clone, Eq, Hash, PartialEq)]
     pub struct Node<'tree> {
         pub(crate) inner: SyntaxNode,
         pub(crate) phantom: std::marker::PhantomData<&'tree ()>,
@@ -499,6 +505,12 @@ mod wasm {
         #[inline]
         pub fn walk(&self) -> TreeCursor<'tree> {
             self.inner.walk().into()
+        }
+    }
+
+    impl<'tree> std::fmt::Debug for Node<'tree> {
+        fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+            std::fmt::Debug::fmt(&self.inner, fmt)
         }
     }
 

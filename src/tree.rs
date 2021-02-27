@@ -2,7 +2,7 @@
 mod native {
     use crate::{input_edit::InputEdit, language::Language, node::Node, range::Range, tree_cursor::TreeCursor};
 
-    #[derive(Clone, Debug)]
+    #[derive(Clone)]
     pub struct Tree {
         pub(crate) inner: tree_sitter::Tree,
     }
@@ -29,6 +29,12 @@ mod native {
         }
     }
 
+    impl std::fmt::Debug for Tree {
+        fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+            std::fmt::Debug::fmt(&self.inner, fmt)
+        }
+    }
+
     impl From<tree_sitter::Tree> for Tree {
         #[inline]
         fn from(inner: tree_sitter::Tree) -> Self {
@@ -44,7 +50,6 @@ pub use native::*;
 mod wasm {
     use crate::{input_edit::InputEdit, language::Language, node::Node, tree_cursor::TreeCursor};
 
-    #[derive(Debug)]
     pub struct Tree {
         pub(crate) inner: web_tree_sitter::Tree,
     }
@@ -91,6 +96,12 @@ mod wasm {
     impl Clone for Tree {
         fn clone(&self) -> Tree {
             self.inner.copy().into()
+        }
+    }
+
+    impl std::fmt::Debug for Tree {
+        fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+            std::fmt::Debug::fmt(&self.inner, fmt)
         }
     }
 

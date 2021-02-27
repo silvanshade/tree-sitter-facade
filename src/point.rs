@@ -2,7 +2,7 @@
 mod native {
     use std::convert::TryFrom;
 
-    #[derive(Clone, Debug, PartialEq)]
+    #[derive(Clone, PartialEq)]
     pub struct Point {
         pub(crate) inner: tree_sitter::Point,
     }
@@ -23,6 +23,18 @@ mod native {
         #[inline]
         pub fn row(&self) -> u32 {
             u32::try_from(self.inner.row).unwrap()
+        }
+    }
+
+    impl std::fmt::Debug for Point {
+        fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+            std::fmt::Debug::fmt(&self.inner, fmt)
+        }
+    }
+
+    impl std::fmt::Display for Point {
+        fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+            std::fmt::Display::fmt(&self.inner, fmt)
         }
     }
 
@@ -47,7 +59,7 @@ pub use native::*;
 
 #[cfg(target_arch = "wasm32")]
 mod wasm {
-    #[derive(Clone, Debug, PartialEq)]
+    #[derive(Clone, PartialEq)]
     pub struct Point {
         pub(crate) inner: web_tree_sitter::Point,
     }
@@ -66,6 +78,18 @@ mod wasm {
         #[inline]
         pub fn row(&self) -> u32 {
             self.inner.row()
+        }
+    }
+
+    impl std::fmt::Debug for Point {
+        fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+            std::fmt::Debug::fmt(&self.inner, fmt)
+        }
+    }
+
+    impl std::fmt::Display for Point {
+        fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+            write!(fmt, "({}, {})", self.row(), self.column())
         }
     }
 
