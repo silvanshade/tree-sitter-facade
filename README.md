@@ -10,9 +10,9 @@
     <a href="https://github.com/hvithrafn/tree-sitter-facade/actions"><img
         src="https://github.com/hvithrafn/tree-sitter-facade/workflows/main/badge.svg"
         /></a>
-    <a href="https://codecov.io/gh/hvithrafn/tree-sitter-facade"><img
+    <!-- <a href="https://codecov.io/gh/hvithrafn/tree-sitter-facade"><img
         src="https://codecov.io/gh/hvithrafn/tree-sitter-facade/branches/main/graph/badge.svg"
-        /></a>
+        /></a> -->
   </p>
 </div>
 
