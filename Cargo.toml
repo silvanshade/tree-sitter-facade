@@ -24,7 +24,7 @@ opt-level = "z"
 anyhow = "1.0"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-tree-sitter = "0.17"
+tree-sitter = "0.19"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 js-sys = "0.3"
