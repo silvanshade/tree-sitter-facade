@@ -107,8 +107,8 @@ mod native {
         }
 
         #[inline]
-        pub fn id(&self) -> u32 {
-            u32::try_from(self.inner.id()).unwrap()
+        pub fn id(&self) -> usize {
+            self.inner.id()
         }
 
         #[inline]
@@ -384,8 +384,8 @@ mod wasm {
         }
 
         #[inline]
-        pub fn id(&self) -> u32 {
-            self.inner.id()
+        pub fn id(&self) -> usize {
+            self.inner.id() as usize
         }
 
         #[inline]
