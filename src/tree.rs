@@ -48,7 +48,8 @@ pub use native::*;
 
 #[cfg(target_arch = "wasm32")]
 mod wasm {
-    use crate::{input_edit::InputEdit, language::Language, node::Node, tree_cursor::TreeCursor};
+    use crate::{input_edit::InputEdit, language::Language, node::Node, range::Range, tree_cursor::TreeCursor};
+    use wasm_bindgen::{prelude::*, JsCast};
 
     pub struct Tree {
         pub(crate) inner: web_tree_sitter::Tree,
@@ -76,9 +77,13 @@ mod wasm {
         }
 
         // FIXME: implement bindings upstream first
-        // pub fn changed_ranges(&self, other: &Tree) -> impl ExactSizeIterator<Item = Range> {
-        //     unimplemented!()
-        // }
+        pub fn changed_ranges(&self, other: &Tree) -> impl ExactSizeIterator<Item = Range> {
+            self.inner
+                .get_changed_ranges(&other.inner)
+                .into_vec()
+                .into_iter()
+                .map(|value| value.unchecked_into::<web_tree_sitter::Range>().into())
+        }
 
         pub fn language(&self) -> Language {
             self.inner.get_language().into()

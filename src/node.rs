@@ -312,23 +312,39 @@ mod wasm {
                 .map(|value| value.unchecked_into::<SyntaxNode>().into())
         }
 
-        // #[inline]
-        // pub fn children_by_field_id<'a>(
-        //     &self,
-        //     field_id: u16,
-        //     cursor: &'a mut TreeCursor<'tree>,
-        // ) -> impl Iterator<Item = Node<'tree>> + 'a {
-        //     unimplemented!()
-        // }
+        pub fn children_by_field_id<'a>(
+            &self,
+            field_id: u16,
+            cursor: &'a mut TreeCursor<'tree>,
+        ) -> impl Iterator<Item = Node<'tree>> + 'a {
+            cursor.reset(self.clone());
+            cursor.goto_first_child();
+            let mut done = false;
+            std::iter::from_fn(move || {
+                while !done {
+                    while cursor.field_id() != Some(field_id) {
+                        if !cursor.goto_next_sibling() {
+                            return None;
+                        }
+                    }
+                    let result = cursor.node();
+                    if !cursor.goto_next_sibling() {
+                        done = true;
+                    }
+                    return Some(result);
+                }
+                None
+            })
+        }
 
-        // #[inline]
-        // pub fn children_by_field_name<'a>(
-        //     &self,
-        //     field_name: &str,
-        //     cursor: &'a mut TreeCursor<'tree>,
-        // ) -> impl Iterator<Item = Node<'tree>> + 'a {
-        //     unimplemented!()
-        // }
+        pub fn children_by_field_name<'a>(
+            &self,
+            field_name: &str,
+            cursor: &'a mut TreeCursor<'tree>,
+        ) -> impl Iterator<Item = Node<'tree>> + 'a {
+            let field_id = self.language().field_id_for_name(field_name);
+            self.children_by_field_id(field_id.unwrap_or(0), cursor)
+        }
 
         #[inline]
         pub fn descendant_for_byte_range(&self, start: u32, end: u32) -> Option<Self> {
