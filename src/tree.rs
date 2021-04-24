@@ -49,7 +49,7 @@ pub use native::*;
 #[cfg(target_arch = "wasm32")]
 mod wasm {
     use crate::{input_edit::InputEdit, language::Language, node::Node, range::Range, tree_cursor::TreeCursor};
-    use wasm_bindgen::{prelude::*, JsCast};
+    use wasm_bindgen::JsCast;
 
     pub struct Tree {
         pub(crate) inner: web_tree_sitter::Tree,
