@@ -258,7 +258,7 @@ pub use native::*;
 
 #[cfg(target_arch = "wasm32")]
 mod wasm {
-    use crate::{point::Point, range::Range, tree_cursor::TreeCursor};
+    use crate::{input_edit::InputEdit, language::Language, point::Point, range::Range, tree_cursor::TreeCursor};
     use std::{borrow::Cow, convert::TryFrom};
     use wasm_bindgen::{prelude::*, JsCast};
     use web_tree_sitter::SyntaxNode;
@@ -358,10 +358,10 @@ mod wasm {
                 .map(Into::into)
         }
 
-        // #[inline]
-        // pub fn edit(&mut self, edit: &InputEdit) {
-        //     unimplemented!()
-        // }
+        #[inline]
+        pub fn edit(&mut self, _edit: &InputEdit) {
+            unimplemented!()
+        }
 
         #[inline]
         pub fn end_byte(&self) -> u32 {
@@ -393,10 +393,10 @@ mod wasm {
             self.kind_id() == u16::MAX
         }
 
-        // #[inline]
-        // pub fn is_extra(&self) -> bool {
-        //     unimplemented!()
-        // }
+        #[inline]
+        pub fn is_extra(&self) -> bool {
+            unimplemented!()
+        }
 
         #[inline]
         pub fn is_missing(&self) -> bool {
@@ -418,10 +418,10 @@ mod wasm {
             self.inner.type_id()
         }
 
-        // #[inline]
-        // pub fn language(&self) -> Language {
-        //     unimplemented!()
-        // }
+        #[inline]
+        pub fn language(&self) -> Language {
+            unimplemented!()
+        }
 
         #[inline]
         pub fn named_child<'a>(&'a self, i: u32) -> Option<Self> {
@@ -508,15 +508,15 @@ mod wasm {
             From::<String>::from(self.inner.to_string().into())
         }
 
-        // #[inline]
-        // pub fn utf8_text<'a>(&self, source: &'a [u8]) -> Result<Cow<'a, str>, std::str::Utf8Error> {
-        //     unimplemented!()
-        // }
+        #[inline]
+        pub fn utf8_text<'a>(&self, _source: &'a [u8]) -> Result<Cow<'a, str>, std::str::Utf8Error> {
+            unimplemented!()
+        }
 
-        // #[inline]
-        // pub fn utf16_text<'a>(&self, source: &'a [u16]) -> &'a [u16] {
-        //     unimplemented!()
-        // }
+        #[inline]
+        pub fn utf16_text<'a>(&self, _source: &'a [u16]) -> &'a [u16] {
+            unimplemented!()
+        }
 
         #[inline]
         pub fn walk(&self) -> TreeCursor<'tree> {
