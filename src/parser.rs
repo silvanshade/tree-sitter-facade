@@ -37,11 +37,7 @@ mod native {
 
         #[inline]
         pub fn logger(&self) -> Option<LoggerReturn> {
-            if let Some(fun) = self.inner.logger() {
-                Some(LoggerReturn::new(fun))
-            } else {
-                None
-            }
+            self.inner.logger().map(LoggerReturn::new)
         }
 
         #[inline]
