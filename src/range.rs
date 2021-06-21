@@ -3,7 +3,7 @@ mod native {
     use crate::point::Point;
     use std::convert::TryFrom;
 
-    #[derive(Clone, PartialEq)]
+    #[derive(Clone, Copy, Eq, Hash, Ord, PartialEq, PartialOrd)]
     pub struct Range {
         pub(crate) inner: tree_sitter::Range,
     }
@@ -69,6 +69,21 @@ mod native {
             Self { inner }
         }
     }
+
+    impl std::panic::RefUnwindSafe for Range {
+    }
+
+    unsafe impl Send for Range {
+    }
+
+    unsafe impl Sync for Range {
+    }
+
+    impl Unpin for Range {
+    }
+
+    impl std::panic::UnwindSafe for Range {
+    }
 }
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -78,7 +93,7 @@ pub use native::*;
 mod wasm {
     use crate::point::Point;
 
-    #[derive(Clone, PartialEq)]
+    #[derive(Clone, Eq, PartialEq)]
     pub struct Range {
         pub(crate) inner: web_tree_sitter::Range,
     }
@@ -112,6 +127,11 @@ mod wasm {
             let inner = self.inner.start_position();
             Point { inner }
         }
+
+        #[inline]
+        fn spread(&self) -> (u32, u32, Point, Point) {
+            (self.start_byte(), self.end_byte(), self.start_point(), self.end_point())
+        }
     }
 
     impl std::fmt::Debug for Range {
@@ -137,10 +157,35 @@ mod wasm {
         }
     }
 
+    impl Ord for Range {
+        fn cmp(&self, that: &Self) -> std::cmp::Ordering {
+            let this = self.spread();
+            let that = that.spread();
+            this.cmp(&that)
+        }
+    }
+
+    impl PartialOrd<Range> for Range {
+        fn partial_cmp(&self, that: &Self) -> Option<std::cmp::Ordering> {
+            let this = self.spread();
+            let that = that.spread();
+            this.partial_cmp(&that)
+        }
+    }
+
+    impl std::panic::RefUnwindSafe for Range {
+    }
+
     unsafe impl Send for Range {
     }
 
     unsafe impl Sync for Range {
+    }
+
+    impl Unpin for Range {
+    }
+
+    impl std::panic::UnwindSafe for Range {
     }
 }
 

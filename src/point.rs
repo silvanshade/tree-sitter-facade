@@ -2,7 +2,7 @@
 mod native {
     use std::convert::TryFrom;
 
-    #[derive(Clone, PartialEq)]
+    #[derive(Clone, Copy, Eq, Hash, Ord, PartialEq, PartialOrd)]
     pub struct Point {
         pub(crate) inner: tree_sitter::Point,
     }
@@ -52,6 +52,21 @@ mod native {
             Self { inner }
         }
     }
+
+    impl std::panic::RefUnwindSafe for Point {
+    }
+
+    unsafe impl Send for Point {
+    }
+
+    unsafe impl Sync for Point {
+    }
+
+    impl Unpin for Point {
+    }
+
+    impl std::panic::UnwindSafe for Point {
+    }
 }
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -59,7 +74,7 @@ pub use native::*;
 
 #[cfg(target_arch = "wasm32")]
 mod wasm {
-    #[derive(Clone, PartialEq)]
+    #[derive(Clone, Eq, PartialEq)]
     pub struct Point {
         pub(crate) inner: web_tree_sitter::Point,
     }
@@ -78,6 +93,11 @@ mod wasm {
         #[inline]
         pub fn row(&self) -> u32 {
             self.inner.row()
+        }
+
+        #[inline]
+        fn spread(&self) -> (u32, u32) {
+            (self.row(), self.column())
         }
     }
 
@@ -108,10 +128,42 @@ mod wasm {
         }
     }
 
+    impl std::hash::Hash for Point {
+        fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+            let this = self.spread();
+            this.hash(state)
+        }
+    }
+
+    impl Ord for Point {
+        fn cmp(&self, that: &Self) -> std::cmp::Ordering {
+            let this = self.spread();
+            let that = that.spread();
+            this.cmp(&that)
+        }
+    }
+
+    impl PartialOrd for Point {
+        fn partial_cmp(&self, that: &Point) -> Option<std::cmp::Ordering> {
+            let this = self.spread();
+            let that = that.spread();
+            this.partial_cmp(&that)
+        }
+    }
+
+    impl std::panic::RefUnwindSafe for Point {
+    }
+
     unsafe impl Send for Point {
     }
 
     unsafe impl Sync for Point {
+    }
+
+    impl Unpin for Point {
+    }
+
+    impl std::panic::UnwindSafe for Point {
     }
 }
 

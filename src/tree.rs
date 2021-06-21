@@ -41,6 +41,21 @@ mod native {
             Self { inner }
         }
     }
+
+    impl std::panic::RefUnwindSafe for Tree {
+    }
+
+    unsafe impl Send for Tree {
+    }
+
+    unsafe impl Sync for Tree {
+    }
+
+    impl Unpin for Tree {
+    }
+
+    impl std::panic::UnwindSafe for Tree {
+    }
 }
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -123,7 +138,19 @@ mod wasm {
         }
     }
 
+    impl std::panic::RefUnwindSafe for Tree {
+    }
+
     unsafe impl Send for Tree {
+    }
+
+    unsafe impl Sync for Tree {
+    }
+
+    impl Unpin for Tree {
+    }
+
+    impl std::panic::UnwindSafe for Tree {
     }
 }
 

@@ -140,6 +140,18 @@ mod native {
             Self { inner }
         }
     }
+
+    impl std::panic::RefUnwindSafe for Parser {
+    }
+
+    unsafe impl Send for Parser {
+    }
+
+    impl Unpin for Parser {
+    }
+
+    impl std::panic::UnwindSafe for Parser {
+    }
 }
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -330,6 +342,15 @@ mod wasm {
             let options = Default::default();
             Self { inner, options }
         }
+    }
+
+    impl std::panic::RefUnwindSafe for Parser {
+    }
+
+    impl Unpin for Parser {
+    }
+
+    impl std::panic::UnwindSafe for Parser {
     }
 }
 

@@ -3,6 +3,7 @@ mod native {
     use crate::node::Node;
     use std::{borrow::Cow, convert::TryFrom};
 
+    #[derive(Clone)]
     pub struct TreeCursor<'a> {
         pub(crate) inner: tree_sitter::TreeCursor<'a>,
     }
@@ -59,6 +60,15 @@ mod native {
             Self { inner }
         }
     }
+
+    impl<'a> std::panic::RefUnwindSafe for TreeCursor<'a> {
+    }
+
+    impl<'a> Unpin for TreeCursor<'a> {
+    }
+
+    impl<'a> std::panic::UnwindSafe for TreeCursor<'a> {
+    }
 }
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -69,6 +79,7 @@ mod wasm {
     use crate::node::Node;
     use std::borrow::Cow;
 
+    #[derive(Clone)]
     pub struct TreeCursor<'a> {
         pub(crate) inner: web_tree_sitter::TreeCursor,
         pub(crate) phantom: std::marker::PhantomData<&'a ()>,
@@ -127,6 +138,15 @@ mod wasm {
             let phantom = std::marker::PhantomData;
             Self { inner, phantom }
         }
+    }
+
+    impl<'a> std::panic::RefUnwindSafe for TreeCursor<'a> {
+    }
+
+    impl<'a> Unpin for TreeCursor<'a> {
+    }
+
+    impl<'a> std::panic::UnwindSafe for TreeCursor<'a> {
     }
 }
 

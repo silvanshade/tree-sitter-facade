@@ -3,7 +3,7 @@ mod native {
     use crate::{input_edit::InputEdit, language::Language, point::Point, range::Range, tree_cursor::TreeCursor};
     use std::{borrow::Cow, convert::TryFrom};
 
-    #[derive(Clone, Eq, Hash, PartialEq)]
+    #[derive(Clone, Copy, Eq, Hash, PartialEq)]
     pub struct Node<'tree> {
         pub(crate) inner: tree_sitter::Node<'tree>,
     }
@@ -250,6 +250,31 @@ mod native {
         fn from(inner: tree_sitter::Node<'tree>) -> Self {
             Node { inner }
         }
+    }
+
+    impl<'a> Ord for Node<'a> {
+        fn cmp(&self, that: &Self) -> std::cmp::Ordering {
+            let this = self.id();
+            let that = that.id();
+            this.cmp(&that)
+        }
+    }
+
+    impl<'a> PartialOrd for Node<'a> {
+        fn partial_cmp(&self, that: &Node<'a>) -> Option<std::cmp::Ordering> {
+            let this = self.id();
+            let that = that.id();
+            this.partial_cmp(&that)
+        }
+    }
+
+    impl<'a> std::panic::RefUnwindSafe for Node<'a> {
+    }
+
+    impl<'a> Unpin for Node<'a> {
+    }
+
+    impl<'a> std::panic::UnwindSafe for Node<'a> {
     }
 }
 
@@ -569,6 +594,31 @@ mod wasm {
         fn len(&self) -> usize {
             self.inner.len()
         }
+    }
+
+    impl<'a> Ord for Node<'a> {
+        fn cmp(&self, that: &Self) -> std::cmp::Ordering {
+            let this = self.id();
+            let that = that.id();
+            this.cmp(&that)
+        }
+    }
+
+    impl<'a> PartialOrd for Node<'a> {
+        fn partial_cmp(&self, that: &Node<'a>) -> Option<std::cmp::Ordering> {
+            let this = self.id();
+            let that = that.id();
+            this.partial_cmp(&that)
+        }
+    }
+
+    impl<'a> std::panic::RefUnwindSafe for Node<'a> {
+    }
+
+    impl<'a> Unpin for Node<'a> {
+    }
+
+    impl<'a> std::panic::UnwindSafe for Node<'a> {
     }
 }
 

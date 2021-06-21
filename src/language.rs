@@ -2,7 +2,7 @@
 mod native {
     use std::{borrow::Cow, convert::TryFrom};
 
-    #[derive(Clone, PartialEq)]
+    #[derive(Clone, Copy, Eq, PartialEq)]
     pub struct Language {
         pub(crate) inner: tree_sitter::Language,
     }
@@ -66,6 +66,21 @@ mod native {
         fn from(inner: tree_sitter::Language) -> Self {
             Self { inner }
         }
+    }
+
+    impl std::panic::RefUnwindSafe for Language {
+    }
+
+    unsafe impl Send for Language {
+    }
+
+    unsafe impl Sync for Language {
+    }
+
+    impl Unpin for Language {
+    }
+
+    impl std::panic::UnwindSafe for Language {
     }
 }
 
@@ -143,10 +158,19 @@ mod wasm {
         }
     }
 
+    impl std::panic::RefUnwindSafe for Language {
+    }
+
     unsafe impl Send for Language {
     }
 
     unsafe impl Sync for Language {
+    }
+
+    impl Unpin for Language {
+    }
+
+    impl std::panic::UnwindSafe for Language {
     }
 }
 

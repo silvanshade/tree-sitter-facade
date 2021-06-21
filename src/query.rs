@@ -26,6 +26,21 @@ mod native {
             Self { inner }
         }
     }
+
+    impl std::panic::RefUnwindSafe for Query {
+    }
+
+    unsafe impl Send for Query {
+    }
+
+    unsafe impl Sync for Query {
+    }
+
+    impl Unpin for Query {
+    }
+
+    impl std::panic::UnwindSafe for Query {
+    }
 }
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -67,10 +82,19 @@ mod wasm {
         }
     }
 
+    impl std::panic::RefUnwindSafe for Query {
+    }
+
     unsafe impl Send for Query {
     }
 
     unsafe impl Sync for Query {
+    }
+
+    impl Unpin for Query {
+    }
+
+    impl std::panic::UnwindSafe for Query {
     }
 }
 
