@@ -219,6 +219,7 @@ mod native {
         }
 
         #[inline]
+        #[allow(clippy::wrong_self_convention)]
         pub fn to_sexp(&self) -> Cow<str> {
             self.inner.to_sexp().into()
         }
@@ -529,6 +530,7 @@ mod wasm {
 
         // FIXME: check that this is correct
         #[inline]
+        #[allow(clippy::wrong_self_convention)]
         pub fn to_sexp(&self) -> Cow<str> {
             From::<String>::from(self.inner.to_string().into())
         }
