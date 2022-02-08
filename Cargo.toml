@@ -28,7 +28,7 @@ tree-sitter = "0.20"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 js-sys = "0.3"
-wasm-bindgen = { version = "=0.2.78", features = ["strict-macro"] }
+wasm-bindgen = { version = "=0.2.79", features = ["strict-macro"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies.web-tree-sitter]
 package = "web-tree-sitter-sys"
