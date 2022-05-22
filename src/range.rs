@@ -3,7 +3,7 @@ mod native {
     use crate::point::Point;
     use std::convert::TryFrom;
 
-    #[derive(Clone, Copy, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[derive(Clone, Eq, Hash, Ord, PartialEq, PartialOrd)]
     pub struct Range {
         pub(crate) inner: tree_sitter::Range,
     }

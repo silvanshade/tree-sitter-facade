@@ -3,7 +3,7 @@ mod native {
     use crate::{input_edit::InputEdit, language::Language, point::Point, range::Range, tree_cursor::TreeCursor};
     use std::{borrow::Cow, convert::TryFrom};
 
-    #[derive(Clone, Copy, Eq, Hash, PartialEq)]
+    #[derive(Clone, Eq, Hash, PartialEq)]
     pub struct Node<'tree> {
         pub(crate) inner: tree_sitter::Node<'tree>,
     }

@@ -2,7 +2,7 @@
 mod native {
     use std::{borrow::Cow, convert::TryFrom};
 
-    #[derive(Clone, Copy, Eq, PartialEq)]
+    #[derive(Clone, Eq, PartialEq)]
     pub struct Language {
         pub(crate) inner: tree_sitter::Language,
     }

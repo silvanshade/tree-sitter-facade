@@ -2,7 +2,7 @@
 mod native {
     use std::convert::TryFrom;
 
-    #[derive(Clone, Copy, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[derive(Clone, Eq, Hash, Ord, PartialEq, PartialOrd)]
     pub struct Point {
         pub(crate) inner: tree_sitter::Point,
     }
