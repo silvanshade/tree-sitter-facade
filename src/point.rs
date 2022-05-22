@@ -74,7 +74,7 @@ pub use native::*;
 
 #[cfg(target_arch = "wasm32")]
 mod wasm {
-    #[derive(Clone, Eq, PartialEq)]
+    #[derive(Clone, Eq, Hash, Ord, PartialEq, PartialOrd)]
     pub struct Point {
         pub(crate) inner: web_tree_sitter::Point,
     }
@@ -93,11 +93,6 @@ mod wasm {
         #[inline]
         pub fn row(&self) -> u32 {
             self.inner.row()
-        }
-
-        #[inline]
-        fn spread(&self) -> (u32, u32) {
-            (self.row(), self.column())
         }
     }
 
@@ -125,29 +120,6 @@ mod wasm {
         #[inline]
         fn from(inner: web_tree_sitter::Point) -> Self {
             Self { inner }
-        }
-    }
-
-    impl std::hash::Hash for Point {
-        fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-            let this = self.spread();
-            this.hash(state)
-        }
-    }
-
-    impl Ord for Point {
-        fn cmp(&self, that: &Self) -> std::cmp::Ordering {
-            let this = self.spread();
-            let that = that.spread();
-            this.cmp(&that)
-        }
-    }
-
-    impl PartialOrd for Point {
-        fn partial_cmp(&self, that: &Point) -> Option<std::cmp::Ordering> {
-            let this = self.spread();
-            let that = that.spread();
-            this.partial_cmp(&that)
         }
     }
 
