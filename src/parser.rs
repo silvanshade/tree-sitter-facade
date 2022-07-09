@@ -19,7 +19,7 @@ mod native {
 
     impl Parser {
         #[inline]
-        pub async fn new() -> Result<Self, ParserError> {
+        pub fn new() -> Result<Self, ParserError> {
             let inner = tree_sitter::Parser::new();
             Ok(Self { inner })
         }
@@ -180,7 +180,7 @@ mod wasm {
 
     impl Parser {
         #[inline]
-        pub async fn new() -> Result<Self, ParserError> {
+        pub fn new() -> Result<Self, ParserError> {
             let inner = web_tree_sitter::Parser::new()?;
             let options = Default::default();
             Ok(Self { inner, options })
