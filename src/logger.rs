@@ -5,12 +5,12 @@ mod native {
     pub type Logger<'a> = Box<dyn FnMut(LogType, &str) + 'a>;
 
     pub struct LoggerReturn<'a, 's> {
-        #[allow(clippy::borrowed_box)]
+        #[allow(clippy::borrowed_box, clippy::type_complexity)]
         pub inner: &'s Box<dyn FnMut(LogType, &str) + 'a>,
     }
 
     impl<'a, 's> LoggerReturn<'a, 's> {
-        #[allow(clippy::borrowed_box)]
+        #[allow(clippy::borrowed_box, clippy::type_complexity)]
         #[inline]
         pub(crate) fn new(inner: &'s Box<dyn FnMut(LogType, &str) + 'a>) -> Self {
             Self { inner }
