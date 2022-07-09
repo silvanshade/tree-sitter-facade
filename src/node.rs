@@ -284,7 +284,7 @@ pub use native::*;
 
 #[cfg(target_arch = "wasm32")]
 mod wasm {
-    use crate::{input_edit::InputEdit, language::Language, point::Point, range::Range, tree_cursor::TreeCursor};
+    use crate::{input_edit::InputEdit, point::Point, range::Range, tree_cursor::TreeCursor};
     use std::{borrow::Cow, convert::TryFrom};
     use wasm_bindgen::{prelude::*, JsCast};
     use web_tree_sitter::SyntaxNode;
@@ -365,11 +365,27 @@ mod wasm {
 
         pub fn children_by_field_name<'a>(
             &self,
-            field_name: &str,
+            field_name: &'a str,
             cursor: &'a mut TreeCursor<'tree>,
         ) -> impl Iterator<Item = Node<'tree>> + 'a {
-            let field_id = self.language().field_id_for_name(field_name);
-            self.children_by_field_id(field_id.unwrap_or(0), cursor)
+            cursor.reset(self.clone());
+            cursor.goto_first_child();
+            let mut done = false;
+            std::iter::from_fn(move || {
+                while !done {
+                    while cursor.field_name() != Some(field_name.into()) {
+                        if !cursor.goto_next_sibling() {
+                            return None;
+                        }
+                    }
+                    let result = cursor.node();
+                    if !cursor.goto_next_sibling() {
+                        done = true;
+                    }
+                    return Some(result);
+                }
+                None
+            })
         }
 
         #[inline]
@@ -442,11 +458,6 @@ mod wasm {
         #[inline]
         pub fn kind_id(&self) -> u16 {
             self.inner.type_id()
-        }
-
-        #[inline]
-        pub fn language(&self) -> Language {
-            unimplemented!()
         }
 
         #[inline]
