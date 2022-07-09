@@ -537,7 +537,7 @@ mod wasm {
 
         #[inline]
         pub fn utf8_text<'a>(&self, _source: &'a [u8]) -> Result<Cow<'a, str>, std::str::Utf8Error> {
-            unimplemented!()
+            std::str::from_utf8(&_source[(self.start_byte() as usize) .. (self.end_byte() as usize)]).map(Into::into)
         }
 
         #[inline]
