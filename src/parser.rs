@@ -181,10 +181,7 @@ mod wasm {
     impl Parser {
         #[inline]
         pub async fn new() -> Result<Self, ParserError> {
-            // FIXME; this should be safe but we should handle the types properly in web-tree-sitter-sys
-            let inner = web_tree_sitter::Parser::new()
-                .await
-                .map_err(|err| unsafe { std::mem::transmute::<_, ParserError>(err) })?;
+            let inner = web_tree_sitter::Parser::new()?;
             let options = Default::default();
             Ok(Self { inner, options })
         }
