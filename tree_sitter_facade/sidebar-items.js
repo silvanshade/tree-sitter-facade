@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["IncludedRangesError",""],["InputEdit",""],["Language",""],["LanguageError",""],["LoggerReturn",""],["Node",""],["Parser",""],["ParserError",""],["Point",""],["Query",""],["QueryError",""],["Range",""],["Tree",""],["TreeCursor",""],["TreeSitter",""]],"type":[["LogType",""],["Logger",""]]};
