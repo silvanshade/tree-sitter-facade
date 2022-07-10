@@ -22,23 +22,18 @@ pub use range::*;
 pub use tree::*;
 pub use tree_cursor::*;
 
+use wasm_bindgen::prelude::*;
+
 pub struct TreeSitter;
 
 impl TreeSitter {
     #[cfg(not(target_arch = "wasm32"))]
-    pub async fn init() -> anyhow::Result<()> {
+    pub async fn init() -> Result<(), JsError> {
         Ok(())
     }
 
     #[cfg(target_arch = "wasm32")]
-    pub async fn init() -> anyhow::Result<()> {
-        use js_sys::JsString;
-        use wasm_bindgen::JsValue;
-        web_tree_sitter::TreeSitter::init()
-            .await
-            .map_err(Into::<JsValue>::into)
-            .map_err(JsString::from)
-            .map_err(String::from)
-            .map_err(anyhow::Error::msg)
+    pub async fn init() -> Result<(), JsError> {
+        web_tree_sitter::TreeSitter::init().await
     }
 }

@@ -21,7 +21,7 @@ opt-level = "z"
 [features]
 
 [dependencies]
-anyhow = "1.0"
+wasm-bindgen = "=0.2.81"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tree-sitter = "0.20"
